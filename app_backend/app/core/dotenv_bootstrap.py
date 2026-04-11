@@ -1,7 +1,5 @@
 """Carrega `.env`: no host, sobrescreve variáveis globais; no Docker Compose preserva `DATABASE_URL` com `@db`."""
 
-from __future__ import annotations
-
 import os
 from pathlib import Path
 

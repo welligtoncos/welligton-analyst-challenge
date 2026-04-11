@@ -8,11 +8,9 @@ from typing import Any
 from uuid import uuid4
 
 import bcrypt
-from jose import JWTError, jwt
+from jose import jwt
 
 from app.core.config import get_settings
-
-settings = get_settings()
 
 TOKEN_TYPE_ACCESS = "access"
 TOKEN_TYPE_REFRESH = "refresh"
@@ -40,6 +38,7 @@ def _now_utc() -> datetime:
 
 def create_access_token(*, subject: str) -> str:
     """JWT de acesso; `sub` = id do usuário (string)."""
+    settings = get_settings()
     expire = _now_utc() + timedelta(minutes=settings.access_token_expire_minutes)
     payload: dict[str, Any] = {
         "sub": subject,
@@ -53,6 +52,7 @@ def create_access_token(*, subject: str) -> str:
 
 def create_refresh_token(*, subject: str) -> str:
     """JWT de renovação; TTL maior que o access token."""
+    settings = get_settings()
     expire = _now_utc() + timedelta(days=settings.refresh_token_expire_days)
     payload: dict[str, Any] = {
         "sub": subject,
@@ -68,15 +68,5 @@ def decode_token(token: str) -> dict[str, Any]:
     """
     Decodifica e valida JWT. Levanta `jose.JWTError` ou subclasses em caso de falha.
     """
+    settings = get_settings()
     return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-
-
-def decode_token_safe(token: str) -> tuple[dict[str, Any] | None, str | None]:
-    """
-    Decodifica JWT sem propagar exceção: retorna (payload, None) ou (None, mensagem).
-    Útil para camadas superiores mapearem 401.
-    """
-    try:
-        return decode_token(token), None
-    except JWTError as exc:
-        return None, str(exc)

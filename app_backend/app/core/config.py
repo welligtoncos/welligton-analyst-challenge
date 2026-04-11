@@ -1,23 +1,24 @@
 """
 Configuração via variáveis de ambiente (pydantic-settings).
 Compatível com SECRET_KEY / ALGORITHM do prompt e com nomes legados (JWT_*).
+
+Antes de importar `get_settings` na entrada da app, chame `load_project_dotenv()`
+(`app.core.dotenv_bootstrap`) para aplicar o `.env` (e regras como preservar `DATABASE_URL` no Docker).
 """
 
 from functools import lru_cache
-from typing import List
 
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Parâmetros da aplicação — não versionar segredos reais."""
+    """
+    Parâmetros da aplicação — não versionar segredos reais.
+    Lê só `os.environ`; o `.env` é carregado antes por `load_project_dotenv()`.
+    """
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
+    model_config = SettingsConfigDict(extra="ignore")
 
     app_name: str = Field(default="API Auth", description="Título na OpenAPI")
     debug: bool = Field(default=False)
@@ -50,7 +51,7 @@ class Settings(BaseSettings):
         validation_alias="REFRESH_TOKEN_EXPIRE_DAYS",
     )
 
-    def cors_origin_list(self) -> List[str]:
+    def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 

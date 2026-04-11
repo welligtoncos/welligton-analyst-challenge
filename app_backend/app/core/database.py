@@ -36,12 +36,10 @@ def get_sync_database_url() -> str:
     return u.render_as_string(hide_password=False)
 
 
-settings = get_settings()
-
 async_engine = create_async_engine(
     get_database_url(),
     pool_pre_ping=True,
-    echo=settings.debug,
+    echo=get_settings().debug,
 )
 
 AsyncSessionLocal = async_sessionmaker(

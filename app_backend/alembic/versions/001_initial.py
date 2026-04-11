@@ -6,16 +6,16 @@ Create Date: 2026-04-10
 
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "001_initial"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 user_role_enum = postgresql.ENUM("admin", "user", name="user_role_enum", create_type=True)
 # Coluna: create_type=False evita segundo CREATE TYPE ao criar a tabela (já criado acima).

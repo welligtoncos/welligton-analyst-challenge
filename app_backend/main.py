@@ -19,6 +19,11 @@ from app.routes import api_router
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
+
+def _operational_error_detail(exc: OperationalError) -> str:
+    return str(exc.orig) if exc.orig is not None else str(exc)
+
+
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
@@ -46,7 +51,7 @@ async def _conflict(_: Request, exc: ConflictError) -> JSONResponse:
 
 @app.exception_handler(OperationalError)
 async def _db_unavailable(_: Request, exc: OperationalError) -> JSONResponse:
-    err_msg = str(exc.orig) if exc.orig is not None else str(exc)
+    err_msg = _operational_error_detail(exc)
     logger.error("PostgreSQL: %s", err_msg)
     payload: dict = {
         "detail": "Não foi possível conectar ao banco de dados. Verifique DATABASE_URL e se o PostgreSQL está acessível.",
@@ -72,13 +77,42 @@ async def health_db() -> dict[str, str]:
         async with async_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
     except OperationalError as exc:
-        err = str(exc.orig) if exc.orig is not None else str(exc)
+        err = _operational_error_detail(exc)
         logger.error("health/db: %s", err)
         raise HTTPException(status_code=503, detail=f"Banco indisponível: {err}") from exc
     return {"database": "ok"}
 
 
-if __name__ == "__main__":
+def run_uvicorn(
+    *,
+    host: str = "0.0.0.0",
+    port: int = 8000,
+    reload: bool | None = None,
+    debug_mode: bool = False,
+) -> None:
+    """
+    Arranque único do servidor.
+
+    `debug_mode=True`: objeto `app`, HTTP h11, sem reload (melhor para breakpoints no Cursor).
+    `debug_mode=False`: import string `main:app` e `reload` conforme `settings.debug` se `reload` for `None`.
+    """
     import uvicorn
 
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=settings.debug)
+    if debug_mode:
+        uvicorn.run(
+            app,
+            host=host,
+            port=port,
+            reload=False,
+            log_level="info",
+            loop="asyncio",
+            http="h11",
+        )
+        return
+    if reload is None:
+        reload = settings.debug
+    uvicorn.run("main:app", host=host, port=port, reload=reload)
+
+
+if __name__ == "__main__":
+    run_uvicorn(host="0.0.0.0", port=8000, debug_mode=False)

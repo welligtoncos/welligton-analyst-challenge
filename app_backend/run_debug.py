@@ -1,16 +1,6 @@
-"""Servidor local só para debug (um processo, sem reload — breakpoints estáveis)."""
+"""Entrada de debug — delega para `main.run_uvicorn` (modo debug estável)."""
 
-import uvicorn
-
-from main import app
+from main import run_uvicorn
 
 if __name__ == "__main__":
-    uvicorn.run(
-        app,
-        host="127.0.0.1",
-        port=8000,
-        reload=False,
-        log_level="info",
-        loop="asyncio",
-        http="h11",
-    )
+    run_uvicorn(host="127.0.0.1", port=8000, reload=False, debug_mode=True)
