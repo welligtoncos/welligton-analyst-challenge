@@ -24,8 +24,11 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False)
 
     cors_origins: str = Field(
-        default="http://localhost:3000",
-        description="Origens CORS separadas por vírgula",
+        default=(
+            "http://localhost:3000,http://127.0.0.1:3000,"
+            "http://localhost:4200,http://127.0.0.1:4200"
+        ),
+        description="Origens CORS separadas por vírgula (inclui Angular ng serve na 4200)",
     )
 
     # URL assíncrona: postgresql+asyncpg://user:pass@host:5432/dbname

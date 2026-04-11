@@ -30,10 +30,13 @@ app = FastAPI(
     description="API com auth JWT (access + refresh): **POST /auth/register**, **POST /auth/login**.",
 )
 
+# Login usa JSON + JWT no header (sem cookie). `allow_origins=["*"]` exige `allow_credentials=False`
+# (senão o browser exige origem explícita e o preflight OPTIONS pode falhar com 400).
+# Em produção com cookies ou origens fixas, troque por `cors_origin_list()` + `allow_credentials=True`.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origin_list(),
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
