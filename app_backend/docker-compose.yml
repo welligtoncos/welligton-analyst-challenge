@@ -1,0 +1,54 @@
+# API FastAPI + PostgreSQL — rede interna, volume persistente no Postgres, healthcheck no banco.
+#
+# Uso: copie .env.example para .env, defina SECRET_KEY e (opcional) POSTGRES_*.
+#      docker compose up --build
+#
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Host 5433 → container 5432 (evita conflito com PostgreSQL instalado no Windows em 5432)
+      - "${POSTGRES_PORT:-5433}:5432"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-appdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Sobrescreve DATABASE_URL para apontar para o serviço `db` na rede Docker
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-appdb}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+    volumes:
+      - .:/app
+    working_dir: /app
+    # Desenvolvimento: hot reload + migrações na subida
+    command: >
+      sh -c "alembic upgrade head &&
+      uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  pgdata:

@@ -1,0 +1,59 @@
+"""
+Configuração via variáveis de ambiente (pydantic-settings).
+Compatível com SECRET_KEY / ALGORITHM do prompt e com nomes legados (JWT_*).
+"""
+
+from functools import lru_cache
+from typing import List
+
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Parâmetros da aplicação — não versionar segredos reais."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    app_name: str = Field(default="API Auth", description="Título na OpenAPI")
+    debug: bool = Field(default=False)
+
+    cors_origins: str = Field(
+        default="http://localhost:3000",
+        description="Origens CORS separadas por vírgula",
+    )
+
+    # URL assíncrona: postgresql+asyncpg://user:pass@host:5432/dbname
+    database_url: str = Field(..., alias="DATABASE_URL")
+
+    # JWT — SECRET_KEY (prompt) ou JWT_SECRET_KEY (.env antigo)
+    secret_key: str = Field(
+        ...,
+        validation_alias=AliasChoices("SECRET_KEY", "JWT_SECRET_KEY"),
+        description="Chave para assinar JWT",
+    )
+    algorithm: str = Field(
+        default="HS256",
+        validation_alias=AliasChoices("ALGORITHM", "JWT_ALGORITHM"),
+    )
+
+    access_token_expire_minutes: int = Field(
+        default=30,
+        validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES",
+    )
+    refresh_token_expire_days: int = Field(
+        default=7,
+        validation_alias="REFRESH_TOKEN_EXPIRE_DAYS",
+    )
+
+    def cors_origin_list(self) -> List[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

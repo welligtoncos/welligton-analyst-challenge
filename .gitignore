@@ -1,0 +1,51 @@
+# Ambiente e segredos (mantenha .env.example versionado)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+pip-wheel-metadata/
+
+# Testes / qualidade
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Ferramentas
+*.log
+
+# Node (frontend / tooling)
+node_modules/
+
+# IDEs e editores
+.idea/
+*.swp
+*.swo
+*~
+
+# SO
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Docker / local
+*.local.yml
