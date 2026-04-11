@@ -2,27 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "FastAPI: app_backend",
+      "name": "FastAPI: debug",
       "type": "debugpy",
       "request": "launch",
-      "module": "uvicorn",
-      "args": ["main:app", "--host", "127.0.0.1", "--port", "8000"],
+      "program": "${workspaceFolder}/app_backend/run_debug.py",
       "cwd": "${workspaceFolder}/app_backend",
       "envFile": "${workspaceFolder}/app_backend/.env",
       "console": "integratedTerminal",
-      "justMyCode": true
-    },
-    {
-      "name": "FastAPI: app_backend (reload)",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "uvicorn",
-      "args": ["main:app", "--reload", "--host", "127.0.0.1", "--port", "8000"],
-      "cwd": "${workspaceFolder}/app_backend",
-      "envFile": "${workspaceFolder}/app_backend/.env",
-      "console": "integratedTerminal",
-      "subProcess": true,
-      "justMyCode": true
+      "python": "${command:python.interpreterPath}",
+      "justMyCode": false
     }
   ]
 }
