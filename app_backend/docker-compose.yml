@@ -1,7 +1,10 @@
-# API FastAPI + PostgreSQL — rede interna, volume persistente no Postgres, healthcheck no banco.
+# API FastAPI + PostgreSQL + Angular (Nginx) — rede interna, volumes nos dados.
 #
 # Uso: copie .env.example para .env, defina SECRET_KEY e (opcional) POSTGRES_*.
 #      docker compose up --build
+#
+# Frontend: http://localhost:${FRONTEND_PORT:-9080}/ (Nginx faz proxy de /api → serviço `api`; 8080 costuma estar ocupada)
+# API no host: porta ${API_HOST_PORT:-8000} → 8000 no container (se 8000 estiver ocupada, defina API_HOST_PORT no .env)
 #
 services:
   db:
@@ -27,7 +30,7 @@ services:
   api:
     build: .
     ports:
-      - "8000:8000"
+      - "${API_HOST_PORT:-8000}:8000"
     env_file:
       - .env
     environment:
@@ -115,6 +118,18 @@ services:
       timeout: 8s
       retries: 10
       start_period: 20s
+
+  frontend:
+    build:
+      context: ../app_frontend_analytst-challenge
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-9080}:80"
+    depends_on:
+      - api
+    networks:
+      - internal
+    restart: unless-stopped
 
   mongo_express:
     image: mongo-express:1.0.2

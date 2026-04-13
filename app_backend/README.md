@@ -46,7 +46,7 @@ alembic upgrade head
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Docker Compose (API + banco)
+## Docker Compose (API + banco + frontend + mensageria + auditoria)
 
 Na pasta `app_backend`:
 
@@ -57,8 +57,23 @@ cp .env.example .env
 docker compose up --build
 ```
 
-- Swagger: http://localhost:8000/docs  
-- Health: http://localhost:8000/health e http://localhost:8000/health/db  
+### Portas no host (`.env`)
+
+| Variável | Padrão | Função |
+|----------|--------|--------|
+| `FRONTEND_PORT` | `9080` | Onde o Nginx publica o Angular no host. |
+| `API_HOST_PORT` | `8000` | Onde a API FastAPI é publicada no host. Use `8001` (ou outra) se aparecer *port is already allocated* na 8000. |
+
+### URLs comuns (exemplo alinhado ao `.env`: `FRONTEND_PORT=9080`, `API_HOST_PORT=8001`)
+
+- **Login (app)**: http://localhost:9080/login  
+- **Swagger direto na API (host)**: http://localhost:8001/docs  
+- **Swagger pelo mesmo origin do app** (proxy Nginx → `/docs` na API): http://localhost:9080/api/docs  
+- **Raiz do app**: http://localhost:9080/  
+- **Health**: http://localhost:8001/health e http://localhost:8001/health/db (troque `8001` pela sua `API_HOST_PORT`).
+
+O Nginx do serviço `frontend` encaminha `/api/*` para `http://api:8000/` na rede Docker (porta interna do container da API é sempre **8000**).
+
 - RabbitMQ Management: http://localhost:15672 (padrão: `app` / `app`)
 - MongoDB: localhost:27017 (padrão: `app` / `app`)
 - Mongo Express: http://localhost:8081 (padrão: `admin` / `admin`)
