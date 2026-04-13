@@ -26,6 +26,7 @@ import { Product, ProductPayload, ProductService } from '../../services/product.
 
 @Component({
   selector: 'app-portal',
+  // REQ Frontend (diferencial): uso de componentes PrimeNG.
   imports: [
     ReactiveFormsModule,
     ToolbarModule,
@@ -64,6 +65,7 @@ export class PortalComponent implements OnInit {
   dialogVisible = false;
   currentProductId: string | null = null;
 
+  // REQ Frontend: formulário reativo com validações para criar/editar produto.
   readonly productForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required, Validators.maxLength(200)]],
     descricao: ['', [Validators.maxLength(2000)]],
@@ -73,6 +75,7 @@ export class PortalComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // REQ Frontend: estado básico de carregamento da listagem.
     this.loadProducts();
   }
 
@@ -93,6 +96,7 @@ export class PortalComponent implements OnInit {
   }
 
   openCreateDialog(): void {
+    // REQ Frontend: modal de criação de produto.
     this.currentProductId = null;
     this.productForm.reset({
       nome: '',
@@ -105,6 +109,7 @@ export class PortalComponent implements OnInit {
   }
 
   openEditDialog(product: Product): void {
+    // REQ Frontend: modal de edição de produto.
     this.currentProductId = product.id;
     this.productForm.reset({
       nome: product.nome,
@@ -133,6 +138,7 @@ export class PortalComponent implements OnInit {
         this.savingProduct = false;
         this.dialogVisible = false;
         this.loadProducts();
+        // REQ Frontend: feedback de sucesso para o usuário.
         this.messageService.add({
           key: 'portal',
           severity: 'success',
@@ -144,6 +150,7 @@ export class PortalComponent implements OnInit {
       },
       error: (err: unknown) => {
         this.savingProduct = false;
+        // REQ Frontend: feedback de erro para o usuário.
         this.messageService.add({
           key: 'portal',
           severity: 'error',
@@ -155,6 +162,7 @@ export class PortalComponent implements OnInit {
   }
 
   confirmDelete(product: Product): void {
+    // REQ Frontend: ação de remoção com confirmação explícita.
     this.confirmationService.confirm({
       header: 'Remover produto',
       message: `Deseja remover "${product.nome}"?`,
@@ -190,6 +198,7 @@ export class PortalComponent implements OnInit {
 
   private loadProducts(): void {
     this.loadingProducts = true;
+    // REQ Frontend: listagem de produtos consumindo API real do backend.
     this.productsService.list().subscribe({
       next: (data) => {
         this.products = data;

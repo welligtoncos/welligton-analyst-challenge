@@ -32,6 +32,7 @@ export class AuthService {
     if (!token) {
       return;
     }
+    // REQ Frontend (diferencial): cache local controlado do token.
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
   }
 
@@ -93,6 +94,7 @@ export class AuthService {
   }
 
   private mapLoginError(err: HttpErrorResponse): string {
+    // REQ Frontend: tratamento de erro de autenticação/autorização no login.
     const body = err.error;
 
     if (body && typeof body === 'object' && 'detail' in body) {

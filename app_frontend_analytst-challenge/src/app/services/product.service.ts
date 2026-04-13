@@ -27,6 +27,7 @@ export interface ProductPayload {
 export class ProductService {
   private readonly http = inject(HttpClient);
 
+  // REQ Frontend: consumo da API real do backend (CRUD de produtos).
   list(): Observable<Product[]> {
     return this.http.get<Product[]>(`${API_BASE_URL}/products`);
   }

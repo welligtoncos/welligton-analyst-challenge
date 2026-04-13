@@ -30,6 +30,7 @@ export class LoginComponent {
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  // REQ Frontend: uso de formulário reativo + validações básicas de login.
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],

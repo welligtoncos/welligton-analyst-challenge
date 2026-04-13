@@ -9,6 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
+  // REQ Frontend: interceptor envia token JWT em todas as chamadas da API.
   const authReq = req.clone({
     setHeaders: auth.getAuthorizationHeader(),
   });

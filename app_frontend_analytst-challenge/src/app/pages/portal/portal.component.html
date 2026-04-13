@@ -49,12 +49,14 @@
     </section>
 
     <p-card header="Listagem de produtos">
+      <!-- REQ Frontend: tratamento básico de estado de carregamento -->
       @if (loadingProducts) {
         <div class="loading-state">
           <p-progressSpinner strokeWidth="6"></p-progressSpinner>
           <p>Carregando produtos...</p>
         </div>
       } @else {
+        <!-- REQ Frontend: tela de listagem de produtos -->
         <p-table
           [value]="products"
           [paginator]="true"
@@ -119,6 +121,7 @@
     [style]="{ width: '36rem' }"
     (visibleChange)="dialogVisible = $event"
   >
+    <!-- REQ Frontend: modal de criação/edição de produto -->
     <form class="product-form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
       <div class="form-field">
         <label for="nome">Nome</label>
