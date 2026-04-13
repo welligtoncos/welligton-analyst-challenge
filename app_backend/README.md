@@ -59,6 +59,7 @@ docker compose up --build
 
 - Swagger: http://localhost:8000/docs  
 - Health: http://localhost:8000/health e http://localhost:8000/health/db  
+- RabbitMQ Management: http://localhost:15672 (padrão: `app` / `app`)
 
 ## Alembic (migrations)
 
