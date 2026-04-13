@@ -40,6 +40,15 @@ class UserLoginRequest(BaseModel):
     password: str = Field(examples=["SenhaSegura123"])
 
 
+class RefreshTokenRequest(BaseModel):
+    """POST /auth/refresh — token de renovação."""
+
+    refresh_token: str = Field(
+        min_length=10,
+        description="JWT refresh token recebido no login",
+    )
+
+
 class UserResponse(BaseModel):
     """Usuário sem campo de senha."""
 

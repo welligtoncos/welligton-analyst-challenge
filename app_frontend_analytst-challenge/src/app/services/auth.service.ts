@@ -20,6 +20,7 @@ export class AuthService {
     return this.http
       .post<LoginResponse>(`${API_BASE_URL}/auth/login`, { email, password })
       .pipe(
+        // REQ: JWT ou mecanismo equivalente no frontend (armazenando access token retornado).
         tap((res) => this.saveToken(res.access_token)),
         catchError((err: HttpErrorResponse) =>
           throwError(() => new Error(this.mapLoginError(err))),
@@ -40,7 +41,14 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getToken();
-    return typeof token === 'string' && token.length > 0;
+    if (typeof token !== 'string' || token.length === 0) {
+      return false;
+    }
+    if (this.isTokenExpired(token)) {
+      this.removeToken();
+      return false;
+    }
+    return true;
   }
 
   removeToken(): void {
@@ -54,6 +62,34 @@ export class AuthService {
   getAuthorizationHeader(): Record<string, string> {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
+  private isTokenExpired(token: string): boolean {
+    const payload = this.parseJwtPayload(token);
+    const exp = payload?.exp;
+    if (typeof exp !== 'number') {
+      return false;
+    }
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    return nowInSeconds >= exp;
+  }
+
+  private parseJwtPayload(token: string): { exp?: number } | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return null;
+      }
+      const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(payload);
+      const parsed: unknown = JSON.parse(decoded);
+      if (!parsed || typeof parsed !== 'object') {
+        return null;
+      }
+      return parsed as { exp?: number };
+    } catch {
+      return null;
+    }
   }
 
   private mapLoginError(err: HttpErrorResponse): string {

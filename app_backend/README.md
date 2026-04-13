@@ -27,7 +27,7 @@ Se aparecer **falha de autenticação** para `app` ou `postgres`, confira **port
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate   # Windows
+venv\Scripts\activate   # Windows
 pip install -r requirements.txt
 # No .env: DATABASE_URL com host/porta do seu Postgres e credenciais reais
 alembic upgrade head

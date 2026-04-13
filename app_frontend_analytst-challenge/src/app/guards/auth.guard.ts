@@ -1,0 +1,17 @@
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+
+import { AuthService } from '../services/auth.service';
+
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  // REQ: fluxo claro de autenticação no frontend (sem token válido, volta para login).
+  if (auth.isAuthenticated()) {
+    return true;
+  }
+
+  void router.navigateByUrl('/login');
+  return false;
+};
