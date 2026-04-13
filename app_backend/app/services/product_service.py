@@ -3,11 +3,13 @@ Regras de negócio do CRUD de produtos.
 """
 
 from collections.abc import Sequence
+import logging
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundError
+from app.messaging.producer import ProductEventPublisher
 from app.repositories.product_repository import ProductRepository
 from app.schemas.product_schema import (
     ProductCreateRequest,
@@ -15,12 +17,15 @@ from app.schemas.product_schema import (
     ProductUpdateRequest,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ProductService:
     def __init__(self, db: AsyncSession) -> None:
         self._products = ProductRepository(db)
+        self._publisher = ProductEventPublisher()
 
-    async def create(self, data: ProductCreateRequest) -> ProductResponse:
+    async def create(self, data: ProductCreateRequest, *, actor: str = "system") -> ProductResponse:
         product = await self._products.create(
             nome=data.nome,
             descricao=data.descricao,
@@ -28,7 +33,9 @@ class ProductService:
             quantidade=data.quantidade,
             ativo=data.ativo,
         )
-        return ProductResponse.model_validate(product)
+        response = ProductResponse.model_validate(product)
+        self._publish_event("product.created", response, actor=actor)
+        return response
 
     async def list_all(self) -> Sequence[ProductResponse]:
         products = await self._products.list_all()
@@ -40,7 +47,13 @@ class ProductService:
             raise NotFoundError("Produto não encontrado.")
         return ProductResponse.model_validate(product)
 
-    async def update(self, product_id: UUID, data: ProductUpdateRequest) -> ProductResponse:
+    async def update(
+        self,
+        product_id: UUID,
+        data: ProductUpdateRequest,
+        *,
+        actor: str = "system",
+    ) -> ProductResponse:
         product = await self._products.get_by_id(product_id)
         if product is None:
             raise NotFoundError("Produto não encontrado.")
@@ -52,9 +65,28 @@ class ProductService:
             setattr(product, key, value)
 
         updated = await self._products.update(product)
-        return ProductResponse.model_validate(updated)
+        response = ProductResponse.model_validate(updated)
+        self._publish_event("product.updated", response, actor=actor)
+        return response
 
-    async def delete(self, product_id: UUID) -> None:
+    async def delete(self, product_id: UUID, *, actor: str = "system") -> None:
+        product = await self._products.get_by_id(product_id)
+        if product is None:
+            raise NotFoundError("Produto não encontrado.")
+
+        response = ProductResponse.model_validate(product)
         deleted = await self._products.delete(product_id)
         if not deleted:
             raise NotFoundError("Produto não encontrado.")
+        self._publish_event("product.deleted", response, actor=actor)
+
+    def _publish_event(self, event_type: str, product: ProductResponse, *, actor: str) -> None:
+        try:
+            self._publisher.publish(
+                event_type=event_type,
+                data=product.model_dump(mode="json"),
+                actor=actor,
+            )
+        except Exception:
+            # Tratamento básico de falha: mantém operação principal e registra erro para observabilidade.
+            logger.exception("Evento RabbitMQ não publicado: %s", event_type)

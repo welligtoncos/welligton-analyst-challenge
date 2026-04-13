@@ -60,6 +60,20 @@ docker compose up --build
 - Swagger: http://localhost:8000/docs  
 - Health: http://localhost:8000/health e http://localhost:8000/health/db  
 - RabbitMQ Management: http://localhost:15672 (padrão: `app` / `app`)
+- MongoDB: localhost:27017 (padrão: `app` / `app`)
+- Mongo Express: http://localhost:8081 (padrão: `admin` / `admin`)
+
+### Fluxo RabbitMQ
+
+- Producer: CRUD de produtos publica `product.created`, `product.updated`, `product.deleted` na exchange `products.events`.
+- Consumer: serviço `audit_consumer` consome `product.*` e grava auditoria assíncrona no MongoDB (`auditdb.product_events`).
+- Falhas básicas: retry por header `x-retries` (até 3), depois DLQ `audit.log.dlq`.
+
+Para ver logs do consumer:
+
+```bash
+docker compose logs -f audit_consumer
+```
 
 ## Alembic (migrations)
 

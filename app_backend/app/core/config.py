@@ -54,6 +54,22 @@ class Settings(BaseSettings):
         validation_alias="REFRESH_TOKEN_EXPIRE_DAYS",
     )
 
+    rabbitmq_url: str = Field(
+        default="amqp://app:app@127.0.0.1:5672/%2f",
+        validation_alias=AliasChoices("RABBITMQ_URL", "AMQP_URL"),
+        description="URL de conexão AMQP do RabbitMQ",
+    )
+    mongo_uri: str = Field(
+        default="mongodb://app:app@127.0.0.1:27017",
+        validation_alias=AliasChoices("MONGO_URI", "MONGODB_URI"),
+        description="URI de conexão do MongoDB para auditoria",
+    )
+    mongo_audit_db: str = Field(default="auditdb", validation_alias="MONGO_AUDIT_DB")
+    mongo_audit_collection: str = Field(
+        default="product_events",
+        validation_alias="MONGO_AUDIT_COLLECTION",
+    )
+
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 

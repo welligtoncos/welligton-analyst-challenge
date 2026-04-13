@@ -38,10 +38,10 @@ async def get_product_service(db: AsyncSession = Depends(get_db)) -> ProductServ
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 async def create_product(
     payload: ProductCreateRequest,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     service: ProductService = Depends(get_product_service),
 ) -> ProductResponse:
-    return await service.create(payload)
+    return await service.create(payload, actor=str(current_user.id))
 
 
 @router.get("", response_model=list[ProductResponse])
@@ -66,17 +66,17 @@ async def get_product_by_id(
 async def update_product(
     product_id: UUID,
     payload: ProductUpdateRequest,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     service: ProductService = Depends(get_product_service),
 ) -> ProductResponse:
-    return await service.update(product_id, payload)
+    return await service.update(product_id, payload, actor=str(current_user.id))
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: UUID,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     service: ProductService = Depends(get_product_service),
 ) -> Response:
-    await service.delete(product_id)
+    await service.delete(product_id, actor=str(current_user.id))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
