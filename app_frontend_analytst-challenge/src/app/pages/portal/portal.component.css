@@ -5,11 +5,11 @@
 
 .page {
   min-height: 100dvh;
-  background: #f8fafc;
+  background: #f4f8ef;
 }
 
 .topbar-wrap {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #d9e6cf;
   background: #ffffff;
 }
 
@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #0f172a;
+  color: #285c44;
 }
 
 .toolbar-actions {
@@ -43,30 +43,138 @@
   gap: 1rem;
 }
 
-.intro-text {
-  margin-top: 0;
-}
-
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: 1rem;
 }
 
 .metric-value {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 0.75rem;
-  color: #0f172a;
+  margin-top: 0.35rem;
+  color: #285c44;
 }
 
-.quick-actions {
-  display: flex;
-  flex-wrap: wrap;
+.loading-state {
+  min-height: 12rem;
+  display: grid;
+  place-items: center;
+  color: #285c44;
   gap: 0.75rem;
 }
 
-.helper-text {
+.text-right {
+  text-align: right;
+}
+
+.actions-col {
+  width: 7rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.descricao-col {
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.form-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #285c44;
+}
+
+.form-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-inputtextarea {
+  width: 100%;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:host ::ng-deep .p-card .p-card-title {
+  font-size: 0.95rem;
+}
+
+:host ::ng-deep .p-toolbar {
+  border-color: transparent;
+}
+
+.loading-state p {
   margin: 0;
-  color: #475569;
+  color: #285c44;
+}
+
+:host ::ng-deep .p-toast {
+  width: min(24rem, calc(100vw - 2rem));
+}
+
+:host ::ng-deep .p-toast .p-toast-message {
+  border-radius: 0.5rem;
+}
+
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success {
+  border: 1px solid #d9e6cf;
+  background: #f4f8ef;
+  color: #111111;
+}
+
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-summary,
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-detail,
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon,
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-icon-close {
+  color: #111111;
+}
+
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-error {
+  border-color: #fecaca;
+  background: #fff5f5;
+  color: #9f1239;
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

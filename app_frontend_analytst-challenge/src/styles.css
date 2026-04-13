@@ -1,5 +1,13 @@
 @import "primeicons/primeicons.css";
 
+:root {
+  --brand-dark: #285c44;
+  --brand-accent: #cad461;
+  --brand-dark-strong: #1f4a37;
+  --brand-bg-soft: #f4f8ef;
+  --brand-border: #d9e6cf;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,4 +17,47 @@ body {
   margin: 0;
   min-height: 100%;
   font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--brand-bg-soft);
+  color: #1f2937;
+}
+
+.p-button.p-button-primary,
+.p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-help):not(.p-button-warning):not(.p-button-danger):not(.p-button-contrast) {
+  background: var(--brand-dark) !important;
+  border-color: var(--brand-dark) !important;
+}
+
+.p-button.p-button-primary:hover,
+.p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-help):not(.p-button-warning):not(.p-button-danger):not(.p-button-contrast):hover {
+  background: var(--brand-dark-strong) !important;
+  border-color: var(--brand-dark-strong) !important;
+}
+
+.p-tag.p-tag-success {
+  background: var(--brand-accent) !important;
+  color: var(--brand-dark) !important;
+}
+
+.p-toolbar,
+.p-card,
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  border-color: var(--brand-border) !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: #f7faef !important;
+  color: var(--brand-dark) !important;
+}
+
+.p-progressspinner-circle {
+  stroke: var(--brand-dark) !important;
+}
+
+.p-inputtext:enabled:focus,
+.p-inputtextarea:enabled:focus,
+.p-inputnumber-input:enabled:focus {
+  border-color: var(--brand-dark) !important;
+  box-shadow: 0 0 0 0.2rem rgba(40, 92, 68, 0.2) !important;
 }

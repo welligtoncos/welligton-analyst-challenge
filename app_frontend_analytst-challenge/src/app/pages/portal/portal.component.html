@@ -1,4 +1,7 @@
 <div class="page">
+  <p-toast key="portal" position="top-right"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
   <header class="topbar-wrap">
     <p-toolbar styleClass="topbar">
       <ng-template #start>
@@ -9,6 +12,12 @@
       </ng-template>
       <ng-template #end>
         <div class="toolbar-actions">
+          <p-button
+            label="Novo produto"
+            icon="pi pi-plus"
+            severity="primary"
+            (onClick)="openCreateDialog()"
+          ></p-button>
           <p-avatar icon="pi pi-user" shape="circle"></p-avatar>
           <p-button
             label="Sair"
@@ -22,44 +31,159 @@
   </header>
 
   <div class="content">
-    <p-card header="Visão Geral">
-      <p class="intro-text">
-        Sessão autenticada com sucesso. Aqui está um painel inicial usando componentes PrimeNG.
-      </p>
-      <p-tag severity="success" value="Usuário autenticado"></p-tag>
-    </p-card>
-
     <section class="metrics-grid">
       <p-card>
-        <ng-template pTemplate="title">Produtos</ng-template>
-        <ng-template pTemplate="subtitle">Catálogo</ng-template>
-        <div class="metric-value">124</div>
-        <p-progressBar [value]="62"></p-progressBar>
+        <ng-template pTemplate="title">Total de produtos</ng-template>
+        <div class="metric-value">{{ totalProducts }}</div>
       </p-card>
 
       <p-card>
-        <ng-template pTemplate="title">Pedidos</ng-template>
-        <ng-template pTemplate="subtitle">Últimos 30 dias</ng-template>
-        <div class="metric-value">38</div>
-        <p-progressBar [value]="48"></p-progressBar>
+        <ng-template pTemplate="title">Produtos ativos</ng-template>
+        <div class="metric-value">{{ totalActiveProducts }}</div>
       </p-card>
 
       <p-card>
-        <ng-template pTemplate="title">Alertas</ng-template>
-        <ng-template pTemplate="subtitle">Estoque mínimo</ng-template>
-        <div class="metric-value">7</div>
-        <p-progressBar [value]="22"></p-progressBar>
+        <ng-template pTemplate="title">Estoque total</ng-template>
+        <div class="metric-value">{{ totalStock }}</div>
       </p-card>
     </section>
 
-    <p-panel header="Ações rápidas">
-      <div class="quick-actions">
-        <p-button label="Novo Produto" icon="pi pi-plus" severity="primary"></p-button>
-        <p-button label="Ver Produtos" icon="pi pi-box" severity="help"></p-button>
-        <p-button label="Relatórios" icon="pi pi-chart-bar" severity="contrast"></p-button>
-      </div>
-      <p-divider></p-divider>
-      <p class="helper-text">Painel pronto para integrar com seu CRUD real.</p>
-    </p-panel>
+    <p-card header="Listagem de produtos">
+      @if (loadingProducts) {
+        <div class="loading-state">
+          <p-progressSpinner strokeWidth="6"></p-progressSpinner>
+          <p>Carregando produtos...</p>
+        </div>
+      } @else {
+        <p-table
+          [value]="products"
+          [paginator]="true"
+          [rows]="8"
+          [stripedRows]="true"
+          [showGridlines]="true"
+          responsiveLayout="scroll"
+          styleClass="p-datatable-sm"
+          emptyMessage="Nenhum produto cadastrado."
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th class="text-right">Preço</th>
+              <th class="text-right">Quantidade</th>
+              <th>Status</th>
+              <th class="actions-col">Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-product>
+            <tr>
+              <td>{{ product.nome }}</td>
+              <td class="descricao-col">{{ product.descricao || '-' }}</td>
+              <td class="text-right">{{ product.preco | number: '1.2-2' }}</td>
+              <td class="text-right">{{ product.quantidade }}</td>
+              <td>
+                <p-tag
+                  [severity]="product.ativo ? 'success' : 'danger'"
+                  [value]="product.ativo ? 'Ativo' : 'Inativo'"
+                ></p-tag>
+              </td>
+              <td class="actions-col">
+                <p-button
+                  icon="pi pi-pencil"
+                  size="small"
+                  severity="info"
+                  [text]="true"
+                  (onClick)="openEditDialog(product)"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  size="small"
+                  severity="danger"
+                  [text]="true"
+                  (onClick)="confirmDelete(product)"
+                ></p-button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </p-card>
   </div>
+
+  <p-dialog
+    [header]="dialogTitle"
+    [modal]="true"
+    [visible]="dialogVisible"
+    [closable]="!savingProduct"
+    [draggable]="false"
+    [style]="{ width: '36rem' }"
+    (visibleChange)="dialogVisible = $event"
+  >
+    <form class="product-form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
+      <div class="form-field">
+        <label for="nome">Nome</label>
+        <input id="nome" pInputText formControlName="nome" />
+        @if (productForm.controls.nome.touched && productForm.controls.nome.invalid) {
+          <small class="field-error">Informe um nome válido.</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="descricao">Descrição</label>
+        <textarea
+          id="descricao"
+          pInputTextarea
+          formControlName="descricao"
+          rows="3"
+          autoResize="true"
+        ></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="preco">Preço</label>
+          <p-inputNumber
+            inputId="preco"
+            formControlName="preco"
+            mode="decimal"
+            [min]="0.01"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+          ></p-inputNumber>
+        </div>
+
+        <div class="form-field">
+          <label for="quantidade">Quantidade</label>
+          <p-inputNumber
+            inputId="quantidade"
+            formControlName="quantidade"
+            [min]="0"
+            [useGrouping]="false"
+          ></p-inputNumber>
+        </div>
+      </div>
+
+      <div class="form-switch">
+        <label for="ativo">Produto ativo</label>
+        <p-inputSwitch inputId="ativo" formControlName="ativo"></p-inputSwitch>
+      </div>
+
+      <div class="dialog-actions">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="savingProduct"
+          (onClick)="dialogVisible = false"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="Salvar"
+          [loading]="savingProduct"
+          [disabled]="savingProduct"
+        ></p-button>
+      </div>
+    </form>
+  </p-dialog>
 </div>

@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: radial-gradient(circle at top, #1d4ed8 0%, #0f172a 60%);
+  background: radial-gradient(circle at top, #cad461 0%, #285c44 65%);
 }
 
 .header {
@@ -23,7 +23,7 @@
 
 .header p {
   margin: 0;
-  color: #64748b;
+  color: #285c44;
 }
 
 .login-form {
@@ -49,4 +49,5 @@
 
 :host ::ng-deep .login-card {
   width: min(100%, 26rem);
+  border: 1px solid #d9e6cf;
 }
