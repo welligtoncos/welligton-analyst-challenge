@@ -11,3 +11,7 @@ class ConflictError(DomainError):
 
 class AuthenticationError(DomainError):
     """Falha de credenciais ou token."""
+
+
+class NotFoundError(DomainError):
+    """Recurso não encontrado."""
