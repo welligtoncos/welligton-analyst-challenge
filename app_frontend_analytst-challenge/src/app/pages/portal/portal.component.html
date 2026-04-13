@@ -1,0 +1,65 @@
+<div class="page">
+  <header class="topbar-wrap">
+    <p-toolbar styleClass="topbar">
+      <ng-template #start>
+        <div class="toolbar-title">
+          <i class="pi pi-chart-line"></i>
+          <strong>Painel Principal</strong>
+        </div>
+      </ng-template>
+      <ng-template #end>
+        <div class="toolbar-actions">
+          <p-avatar icon="pi pi-user" shape="circle"></p-avatar>
+          <p-button
+            label="Sair"
+            icon="pi pi-sign-out"
+            severity="secondary"
+            (onClick)="sair()"
+          ></p-button>
+        </div>
+      </ng-template>
+    </p-toolbar>
+  </header>
+
+  <div class="content">
+    <p-card header="Visão Geral">
+      <p class="intro-text">
+        Sessão autenticada com sucesso. Aqui está um painel inicial usando componentes PrimeNG.
+      </p>
+      <p-tag severity="success" value="Usuário autenticado"></p-tag>
+    </p-card>
+
+    <section class="metrics-grid">
+      <p-card>
+        <ng-template pTemplate="title">Produtos</ng-template>
+        <ng-template pTemplate="subtitle">Catálogo</ng-template>
+        <div class="metric-value">124</div>
+        <p-progressBar [value]="62"></p-progressBar>
+      </p-card>
+
+      <p-card>
+        <ng-template pTemplate="title">Pedidos</ng-template>
+        <ng-template pTemplate="subtitle">Últimos 30 dias</ng-template>
+        <div class="metric-value">38</div>
+        <p-progressBar [value]="48"></p-progressBar>
+      </p-card>
+
+      <p-card>
+        <ng-template pTemplate="title">Alertas</ng-template>
+        <ng-template pTemplate="subtitle">Estoque mínimo</ng-template>
+        <div class="metric-value">7</div>
+        <p-progressBar [value]="22"></p-progressBar>
+      </p-card>
+    </section>
+
+    <p-panel header="Ações rápidas">
+      <div class="quick-actions">
+        <p-button label="Novo Produto" icon="pi pi-plus" severity="primary"></p-button>
+        <p-button label="Ver Produtos" icon="pi pi-box" severity="help"></p-button>
+        <p-button label="Relatórios" icon="pi pi-chart-bar" severity="contrast"></p-button>
+      </div>
+      <p-divider></p-divider>
+      <p class="helper-text">Painel pronto para integrar com seu CRUD real.</p>
+    </p-panel>
+  </div>
+</div>

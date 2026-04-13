@@ -10,10 +10,11 @@ export const routes: Routes = [
       import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
-    path: 'inicio',
+    path: 'portal',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/inicio/inicio.component').then((m) => m.InicioComponent),
+      import('./pages/portal/portal.component').then((m) => m.PortalComponent),
   },
+  { path: 'inicio', pathMatch: 'full', redirectTo: 'portal' },
   { path: '**', redirectTo: 'login' },
 ];

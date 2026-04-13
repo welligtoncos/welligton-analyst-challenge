@@ -1,12 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { PasswordModule } from 'primeng/password';
 
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    CardModule,
+    InputTextModule,
+    PasswordModule,
+    ButtonModule,
+    MessageModule,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -36,7 +48,7 @@ export class LoginComponent {
     this.auth.login(email, password).subscribe({
       next: () => {
         this.loading.set(false);
-        void this.router.navigateByUrl('/inicio');
+        void this.router.navigateByUrl('/portal');
       },
       error: (err: Error) => {
         this.loading.set(false);
